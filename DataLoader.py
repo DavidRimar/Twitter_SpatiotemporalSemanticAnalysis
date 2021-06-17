@@ -62,6 +62,24 @@ class DataLoader():
 
             print('Updated tweet with ID{tweet_ID}!')
 
+    def update_by_fishnetID(self, model, row):
+
+        spat_temp_ID = str(row['spat_temp_id_str'])
+        sig_words_dict = row['sig_words_dict']
+
+        # connect to DB with session
+        with self.session_scope() as s:
+
+            """
+            for row in s.query(model).filter(model.tweet_id == tweet_ID).all():
+
+                print(f"ROW with {tweet_ID}", row)
+            """
+            s.query(model).filter(model.spat_temp_id_str == spat_temp_ID).update(
+                {model.tfidf_topwords: sig_words_dict})
+
+            print(f'Updated tweet with ID{spat_temp_ID}!')
+
     # TRANSFORM AND LOAD
     # 2.
 
@@ -71,7 +89,8 @@ class DataLoader():
         for index, row in dataframe.iterrows():
 
             # call
-            self.update_by_tweetID(model, row)
+            # self.update_by_tweetID(model, row)
+            self.update_by_fishnetID(model, row)
 
     @ contextmanager
     def session_scope(self):

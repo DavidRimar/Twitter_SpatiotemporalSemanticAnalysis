@@ -28,14 +28,17 @@ class TFIDF():
 
         self.nlp_pre_processor = NLPPreProcessor(self.dataframe)
 
-    def get_tfidf_significant_words(self):
+    def get_tfidf_significant_words(self, fishnet_id):
 
+        spat_temp_id_str_list = []
         fishnet_id_list = []
         temp_ID_list = []
         sig_words_list = []
+        sig_weights_list = []
+        sig_words_dict = []
 
         # LOOP THROUGH EACH DAY (i.e. temp_day_ID)
-        for i in range(1, 3):
+        for i in range(1, 39):
 
             # df for one time window
             temp_df = self.dataframe.loc[self.dataframe['temp_day_id'] == i]
@@ -64,38 +67,69 @@ class TFIDF():
                 cleansed_tweet_corpus)
 
             # GET SIGNIFICANT WORDS
+            #
             response = vectorizer.transform([vocab_as_doc])
+
+            # sorted tfidf
+            tfidf_sorted = np.argsort(response.toarray()).flatten()[::-1]
+
             feature_names = vectorizer.get_feature_names()
 
-            # for col in response.nonzero()[1]:
-            # if response[0, col] > 0.4:
-            #    print(feature_names[col], ' - ', response[0, col])
-
-            # construct line to write
-            # line = "8," + str(i) + "," + feature_names
-
             feature_array = np.array(vectorizer.get_feature_names())
-            tfidf_sorting = np.argsort(response.toarray()).flatten()[::-1]
 
-            print("asfa \n", tfidf_sorting)
+            tfidf_top_10 = feature_array[tfidf_sorted][:10]
+            tfidf_11 = feature_array[tfidf_sorted][11]
 
-            n = 10
-            top_n = feature_array[tfidf_sorting][:n]
+            #print("type of: ", type(top_n))
+            #print("type of: ", top_n[0])
+            #print("type of: ", top_n[1])
+            # print(f"{i}: ", tfidf_top_10)
 
-            print("type of: ", type(top_n))
-            print("type of: ", top_n[0])
-            print("type of: ", top_n[1])
+            sig_weights_current = []
+            sig_words_dict_current = {}
 
-            print(f"{i}: ", top_n)
+            for col in response.nonzero()[1]:
+                if feature_names[col] in tfidf_top_10:
+
+                    word = ""
+
+                    if feature_names[col] == "and":
+
+                        word = tfidf_11
+
+                    else:
+
+                        word = feature_names[col]
+
+                    weight = response[0, col]
+
+                    print(word, ' - ', weight)
+
+                    # add to dictionary
+                    sig_words_dict_current[word] = weight
+
+                    # add to weights list
+
+                    sig_weights_current.append(weight)
+
+            # append sig weights
+            sig_weights_list.append(sig_weights_current)
+
+            sig_words_dict.append(sig_words_dict_current)
+
+            print("current weights: ", sig_weights_current)
+            print("current dict: ", sig_words_dict_current)
 
             # BUILD RESULT DF
-            fishnet_id_list.append(2)
+            spat_temp_id_str_current = str(fishnet_id) + "_" + str(i)
+            spat_temp_id_str_list.append(spat_temp_id_str_current)
+            fishnet_id_list.append(fishnet_id)
             temp_ID_list.append(i)
-            sig_words_list.append(top_n)
+            sig_words_list.append(tfidf_top_10)  # tfidf_top_10 is an array
 
         # end of loop
-        df_tfidf = pd.DataFrame(list(zip(fishnet_id_list, temp_ID_list, sig_words_list)), columns=[
-                                "fishnet_id", "temp_day_id", "sig_words_array"])
+        df_tfidf = pd.DataFrame(list(zip(spat_temp_id_str_list, fishnet_id_list, temp_ID_list, sig_words_dict)), columns=[
+                                "spat_temp_id_str", "fishnet_id", "temp_day_id", "sig_words_dict"])
 
         # return
         return df_tfidf

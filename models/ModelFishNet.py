@@ -21,17 +21,19 @@ class BristolFishnet(Base):
     spat_temp_id_str = Column(String)
     fishnet_id = Column(Integer)
     temp_day_id = Column(Integer)
+    tfidf_topwords = Column(JSON)
 
     # Constructor
 
     def __repr__(self):
-        return "<Tweet(spat_temp_id='{}', spat_temp_id_str='{}', fishnet_id={}, temp_day_id={})>".format(self.spat_temp_id, self.spat_temp_id_str, self.fishnet_id, self.temp_day_id)
+        return "<Tweet(spat_temp_id='{}', spat_temp_id_str='{}', fishnet_id={}, temp_day_id={}, tfidf_topwords={})>".format(self.spat_temp_id, self.spat_temp_id_str, self.fishnet_id, self.temp_day_id, self.tfidf_topwords)
 
     def as_dict(self):
 
         as_dict = {'spat_temp_id': self.spat_temp_id,
                    'spat_temp_id_str': self.spat_temp_id_str,
                    'fishnet_id': self.fishnet_id,
-                   'temp_day_id': self.temp_day_id}
+                   'temp_day_id': self.temp_day_id,
+                   'tfidf_topwords': self.tfidf_topwords}
 
         return as_dict

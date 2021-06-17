@@ -170,16 +170,36 @@ class NLPPreProcessor():
 
     # words is an array
 
+    def custom_stopwords(self):
+
+        custom_stopwords = stopwords.words('english')
+
+        # add words
+        custom_stopwords.append('would')
+        # custom_stopwords.append('and')
+
+        return custom_stopwords
+
     def remove_stopwords(self, single_tweet_tokenized):
 
         new_single_tweet = []
 
         for word in single_tweet_tokenized:
 
-            if word not in stopwords.words('english'):
+            if word not in self.custom_stopwords():
 
                 new_single_tweet.append(word)
+            """
+            else:
 
+                if word == "and":
+
+                    print(word)
+
+                if word == "would":
+
+                    print(word)
+            """
         return new_single_tweet
 
     def cleanse_single_tweet(self, single_tweet):
@@ -223,6 +243,8 @@ class NLPPreProcessor():
 
         cleansed_tweets_array = []
 
+        # print("Stopwords: ", self.custom_stopwords())
+
         for tweet in tweet_array_to_cleanse:
 
             # print("RAW TWEET:\n", tweet)
@@ -230,7 +252,7 @@ class NLPPreProcessor():
             # cleansed version of the tweet
             cleansed_single_tweet = self.cleanse_single_tweet(tweet)
 
-            # print("CLEANSED TWEET:\n", cleansed_single_tweet)
+            #print("CLEANSED TWEET:\n", cleansed_single_tweet)
 
             # append to cleansed tweets array
             cleansed_tweets_array.append(cleansed_single_tweet)
