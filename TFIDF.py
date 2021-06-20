@@ -28,6 +28,165 @@ class TFIDF():
 
         self.nlp_pre_processor = NLPPreProcessor(self.dataframe)
 
+    def get_tfidf_spat_temp(self):
+
+        # arrays holding results for all time windows and space
+        final_spat_temp_id_str_list = []
+        final_fishnet_id_list = []
+        final_temp_ID_list = []
+        # final_sig_words_list = []
+        # final_sig_weights_list = []
+        final_sig_words_dict = []
+
+        # max(df['temp_day_id'])
+
+        # FOR LOOP: slice it by day
+        for day in range(1, 2):
+
+            # get df for this time window (across all grids)
+            temp_df = self.dataframe.loc[self.dataframe['temp_day_id'] == day]
+
+            print("length of temp_df\n", len(temp_df))
+
+            # ######## calculate IDF score #######
+            # raw tweet text array
+            raw_tweet_corpus_day = self.nlp_pre_processor.get_raw_tweet_text_array(
+                temp_df)
+
+            # CLEANSE ALL TWEETS
+            cleansed_tweet_corpus_day = self.nlp_pre_processor.cleanse_all_tweets(
+                raw_tweet_corpus_day)
+
+            cleansed_tweet_corpus_day_joined = [
+                ' '.join(arr) for arr in cleansed_tweet_corpus_day]
+
+            print("Cleansing DONE!")
+
+            # VECTORIZE
+            vectorizer = TfidfVectorizer()
+            vectorizer.fit_transform(cleansed_tweet_corpus_day_joined)
+
+            """
+            Now, we have the collection of documents
+            i.e. the IDF part calculated.
+            Next, we build documents per spatial grid
+            """
+
+            # arrays holding results for this time window
+            # spat_temp_id_str_list = []
+            # fishnet_id_list = []
+            # temp_ID_list = []
+            # sig_words_list = []
+            # sig_weights_list = []
+            # sig_words_dict = []
+
+            n_of_fishnet_grids = int(max(temp_df['fishnet_c_id']))
+            print("fishnet: ", n_of_fishnet_grids)
+
+            # FOR LOOP: slice by space
+            for grid in range(1, 4):
+
+                # slice temp_df for this grid
+                spat_temp_df = temp_df.loc[temp_df['fishnet_c_id'] == grid]
+
+                print(
+                    f"length of spat_temp_df at {day} {grid}\n", len(spat_temp_df))
+
+                # raw tweet text array
+                raw_tweet_corpus_day_grid = self.nlp_pre_processor.get_raw_tweet_text_array(
+                    spat_temp_df)
+
+                # CLEANSE ALL TWEETS
+                cleansed_tweet_corpus_day_grid = self.nlp_pre_processor.cleanse_all_tweets(
+                    raw_tweet_corpus_day_grid)
+
+                # cleansed_spat_temp_tweet_corpus_joined = [
+                #    ' '.join(arr) for arr in cleansed_spat_temp_tweet_corpus]
+
+                # BUILD DOCUMENT
+                spat_temp_doc = self.build_document_from_corpus(
+                    cleansed_tweet_corpus_day_grid)
+
+                # GET SIGNIFICANT WORDS
+                # TF PART: the spat temp document is evaluated in the light
+                # of the IDF learned on this temporal window i.e. the IDF part
+                day_grid_response = vectorizer.transform([spat_temp_doc])
+
+                # sorted tfidf
+                tfidf_sorted = np.argsort(
+                    day_grid_response.toarray()).flatten()[::-1]
+
+                feature_names = vectorizer.get_feature_names()
+
+                feature_array = np.array(vectorizer.get_feature_names())
+
+                tfidf_top_10 = feature_array[tfidf_sorted][:10]
+                tfidf_11 = feature_array[tfidf_sorted][11]
+
+                sig_weights_current = []
+                sig_words_dict_current = {}
+
+                for col in day_grid_response.nonzero()[1]:
+                    if feature_names[col] in tfidf_top_10:
+
+                        word = ""
+
+                        if feature_names[col] == "and":
+
+                            word = tfidf_11
+
+                        else:
+
+                            word = feature_names[col]
+
+                        weight = day_grid_response[0, col]
+
+                        print(word, ' - ', weight)
+
+                        # add to weights list
+                        sig_weights_current.append(weight)
+
+                        # add to dictionary
+                        sig_words_dict_current[word] = weight
+
+                # append sig weights
+                # sig_weights_list.append(sig_weights_current)
+
+                final_sig_words_dict.append(sig_words_dict_current)
+
+                # print("current weights: ", sig_weights_current)
+                # print("current dict: ", sig_words_dict_current)
+
+                # APPEND RESULTS TO LISTS (this time window's results)
+                spat_temp_id_str_current = str(grid) + "_" + str(day)
+                final_spat_temp_id_str_list.append(spat_temp_id_str_current)
+                final_fishnet_id_list.append(grid)
+                final_temp_ID_list.append(day)
+                # sig_words_list.append(tfidf_top_10)  # tfidf_top_10 is an array
+
+            # LOOP END: SPATIAL
+            # when this time window's spatial loop is over
+            # what we have is the data for one day in lists
+            # lets append them to the top level lists
+            """
+            final_spat_temp_id_str_list.append(spat_temp_id_str_list)
+            final_fishnet_id_list.append(fishnet_id_list)
+            final_temp_ID_list.append(temp_ID_list)
+            final_sig_words_list.append(sig_weights_list)
+            final_sig_weights_list.append(sig_weights_list)
+            final_sig_words_dict.append(sig_words_dict)
+            """
+        # LOOP END: TEMPORAL
+
+        # BUILD FINAL DF
+        df_tfidf = pd.DataFrame(list(zip(final_spat_temp_id_str_list, final_fishnet_id_list, final_temp_ID_list, final_sig_words_dict)), columns=[
+            "spat_temp_id_str", "fishnet_id", "temp_day_id", "sig_words_dict"])
+
+        # when all time windows are over,
+        # we want the df_spat_tfidfs to be concatenated
+        # and returned
+        return df_tfidf
+
     def get_tfidf_significant_words(self, fishnet_id):
 
         spat_temp_id_str_list = []
@@ -80,9 +239,9 @@ class TFIDF():
             tfidf_top_10 = feature_array[tfidf_sorted][:10]
             tfidf_11 = feature_array[tfidf_sorted][11]
 
-            #print("type of: ", type(top_n))
-            #print("type of: ", top_n[0])
-            #print("type of: ", top_n[1])
+            # print("type of: ", type(top_n))
+            # print("type of: ", top_n[0])
+            # print("type of: ", top_n[1])
             # print(f"{i}: ", tfidf_top_10)
 
             sig_weights_current = []
@@ -112,6 +271,13 @@ class TFIDF():
 
                     sig_weights_current.append(weight)
 
+            # BUILD RESULT DF
+            spat_temp_id_str_current = str(fishnet_id) + "_" + str(i)
+            spat_temp_id_str_list.append(spat_temp_id_str_current)
+            fishnet_id_list.append(fishnet_id)
+            temp_ID_list.append(i)
+            sig_words_list.append(tfidf_top_10)  # tfidf_top_10 is an array
+
             # append sig weights
             sig_weights_list.append(sig_weights_current)
 
@@ -120,16 +286,9 @@ class TFIDF():
             print("current weights: ", sig_weights_current)
             print("current dict: ", sig_words_dict_current)
 
-            # BUILD RESULT DF
-            spat_temp_id_str_current = str(fishnet_id) + "_" + str(i)
-            spat_temp_id_str_list.append(spat_temp_id_str_current)
-            fishnet_id_list.append(fishnet_id)
-            temp_ID_list.append(i)
-            sig_words_list.append(tfidf_top_10)  # tfidf_top_10 is an array
-
         # end of loop
         df_tfidf = pd.DataFrame(list(zip(spat_temp_id_str_list, fishnet_id_list, temp_ID_list, sig_words_dict)), columns=[
-                                "spat_temp_id_str", "fishnet_id", "temp_day_id", "sig_words_dict"])
+            "spat_temp_id_str", "fishnet_id", "temp_day_id", "sig_words_dict"])
 
         # return
         return df_tfidf
@@ -137,7 +296,7 @@ class TFIDF():
     """
     cleansed_tweet_corpus is an array of arrays where each array contains
     tokens of a single tweet.
-    The aim is to join them up as a single document, to get a list of significant words.
+    This function joins them all up to form a single document.
     """
 
     def build_document_from_corpus(self, cleansed_tweet_corpus):
@@ -183,7 +342,7 @@ class TFIDF():
         X = vectorizer.fit_transform(cleansed_tweet_corpus_joined)
 
         # ENSURES ALL VALUES ARE FLOAT
-        #Xdense = np.matrix(Xclean).astype('float')
+        # Xdense = np.matrix(Xclean).astype('float')
         Xdense = np.matrix(X.toarray()).astype('float')
 
         # print("X dense: ", Xdense[2])
@@ -265,10 +424,10 @@ class TFIDF():
         print("freq_th\n", freq_th)
 
         # DENDOGRAM
-        #dendogram1 = sch.dendrogram(L, p=35)
+        # dendogram1 = sch.dendrogram(L, p=35)
         # print("dendo", dendogram)
 
-        #fig, axes = plt.subplots(1, figsize=(8, 3))
+        # fig, axes = plt.subplots(1, figsize=(8, 3))
 
         # dendogram2 = hierarchy.dendrogram(
         #    L)

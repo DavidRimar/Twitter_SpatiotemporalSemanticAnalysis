@@ -23,16 +23,17 @@ from FishNetLoader import *
 
 
 def main():
-
+    """
     # fishnet ID
     fishnet_id = 4
+    """
 
     # INSTANTIATE TweetCrawler object
     tweetCrawler = TweetCrawler(DATABASE_URI_RDS_TWEETS)
 
     # GET tweets
     query_df = tweetCrawler.crawl_data_with_session(
-        BristolFishNet_11_5, fishnet_id)
+        BristolFishNet_11_5)
 
     # convert "created_at" to datetime
     query_df["created_at"] = pd.to_datetime(query_df["created_at"])
@@ -44,14 +45,17 @@ def main():
     # INSTANTIATE TFIDF
     tfidf = TFIDF(query_df)
 
-    sig_words_df = tfidf.get_tfidf_significant_words(fishnet_id)
+    # sig_words_df = tfidf.get_tfidf_significant_words(fishnet_id)
+    sig_words_df = tfidf.get_tfidf_spat_temp()
+
+    print("sig_words:\n", sig_words_df)
 
     # LOAD DATA
     data_loader = DataLoader(DATABASE_URI_RDS_TWEETS)
 
-    data_loader.update_all(sig_words_df, BristolFishnet)
+    # data_loader.update_all(sig_words_df, BristolFishnet)
 
-    # sig_words_df.to_csv("fishnet_results/sig_words/test2.csv")
+    sig_words_df.to_csv("fishnet_results/sig_words/bristol_trial_2.csv")
 
     #print(sig_words_df.loc[:, "sig_words_array"])
     #print(sig_words_df.loc[:, "sig_weights_array"])
