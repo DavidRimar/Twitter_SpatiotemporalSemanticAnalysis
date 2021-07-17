@@ -15,7 +15,6 @@ from sklearn import metrics
 import fastcluster
 import scipy.cluster.hierarchy as sch
 from collections import Counter
-import CMUTweetTagger
 from scipy.cluster import hierarchy
 
 
@@ -26,7 +25,7 @@ def main():
 
     # GET tweets
     query_df = tweetCrawler.crawl_data_with_session(
-        BristolSet2FishNet, 8)
+        Bristol_Set2_DBSCAN4)
 
     # save it to csv
     # query_df.to_csv('data/bristol_sem.csv', sep=",")
@@ -59,7 +58,7 @@ def main():
     # print("lenght of c: ", len(raw_tweet_corpus))
 
     # take a subset of the raw tweet corpus
-    #sample = raw_tweet_corpus[0:15]
+    # sample = raw_tweet_corpus[0:15]
 
     # print(len(sample))
 
@@ -89,15 +88,16 @@ def main():
     for i in range(0, X.shape[0]):
         # keep sample with size at least 5
         # (X[i] is accessing rows)
-        if X[i].sum() > 0.4:
-            Xclean = np.vstack([Xclean, X[i].toarray()])
-            # print("CLEAN:\n", Xclean.shape)
-            # print("MAP INDEX:\n", map_index_after_cleaning)
-            map_index_after_cleaning[Xclean.shape[0] - 2] = i
 
-        else:
-            # show what is removed
-            print("X SMALL: ", X[i].toarray())
+        # if X[i].sum() > 0.4:
+        Xclean = np.vstack([Xclean, X[i].toarray()])
+        # print("CLEAN:\n", Xclean.shape)
+        # print("MAP INDEX:\n", map_index_after_cleaning)
+        map_index_after_cleaning[Xclean.shape[0] - 2] = i
+
+        # else:
+        # show what is removed
+        #    print("X SMALL: ", X[i].toarray())
 
     Xclean = Xclean[1:, ]  # remove first row with zeros
 

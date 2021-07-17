@@ -15,6 +15,7 @@ import unicodedata
 import re
 import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.stem import WordNetLemmatizer
 
 # STEP 1: BUILD CORPUS
 
@@ -202,7 +203,16 @@ class NLPPreProcessor():
             """
         return new_single_tweet
 
-    def cleanse_single_tweet(self, single_tweet):
+    def lemmatize_verbs(self, tokens):
+        """Lemmatize verbs in list of tokenized words"""
+        lemmatizer = WordNetLemmatizer()
+        lemmas = []
+        for token in tokens:
+            lemma = lemmatizer.lemmatize(token, pos='v')
+            lemmas.append(lemma)
+        return lemmas
+
+    def cleanse_single_tweet(self, single_tweet, lemmatize):
 
         # REMOVE URL
         single_tweet = self.remove_urls(single_tweet)
@@ -230,6 +240,9 @@ class NLPPreProcessor():
         # REMOVE PUNCTUATION
         clean_tokenized_tweet = self.remove_punctuation(clean_tokenized_tweet)
 
+        # LEMMATIZE (if true)
+        clean_tokenized_tweet = self.lemmatize_verbs(clean_tokenized_tweet)
+
         # REPLACE NUMBERS
         clean_tokenized_tweet = self.replace_numbers_with_words(
             clean_tokenized_tweet)
@@ -239,7 +252,7 @@ class NLPPreProcessor():
 
         return clean_tokenized_tweet
 
-    def cleanse_all_tweets(self, tweet_array_to_cleanse):
+    def cleanse_all_tweets(self, tweet_array_to_cleanse, lemmatize=False):
 
         cleansed_tweets_array = []
 
@@ -250,7 +263,7 @@ class NLPPreProcessor():
             # print("RAW TWEET:\n", tweet)
 
             # cleansed version of the tweet
-            cleansed_single_tweet = self.cleanse_single_tweet(tweet)
+            cleansed_single_tweet = self.cleanse_single_tweet(tweet, lemmatize)
 
             #print("CLEANSED TWEET:\n", cleansed_single_tweet)
 

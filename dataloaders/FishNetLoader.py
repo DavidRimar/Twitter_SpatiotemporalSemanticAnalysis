@@ -72,7 +72,7 @@ class FishNetLoader():
         # for loop
         for index, row in dataframe.iterrows():
 
-            pid = index
+            pid = index + 50266
             # print(pid)
             # print(type(pid))
             spat_temp_id = row["spat_temp_id"]
@@ -91,7 +91,7 @@ class FishNetLoader():
 
             # construct a Tweet() object
             # data passed in to Tweet() has to be in a dictionary format
-            single_row = BristolFishnet(**as_dict)
+            single_row = BristolFishnet_88_40(**as_dict)
 
             # print(single_row)
             # load data

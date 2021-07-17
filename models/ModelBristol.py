@@ -20,16 +20,18 @@ class BristolSEM(Base):
     tweet_id = Column(String)  # (data.id)
     text = Column(String)  # (data.text)
     created_at = Column(DateTime)  # (data.created_at)
+    tweet_score = Column(Integer)
 
     # Constructor
     def __repr__(self):
-        return "<Tweet(tweet_id='{}', text='{}', created_at={})>".format(self.tweet_id, self.text, self.created_at)
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, tweet_score={})>".format(self.tweet_id, self.text, self.created_at, self.tweet_score)
 
     def as_dict(self):
 
         tweet_as_dict = {'tweet_id': self.tweet_id,
                          'text': self.text,
-                         'created_at': self.created_at}
+                         'created_at': self.created_at,
+                         'tweet_score': self.tweet_score}
 
         return tweet_as_dict
 
@@ -220,5 +222,90 @@ class BristolFishNet_11_5(Base):
                          'final_point_lat': self.final_point_lat,
                          'fishnet_c_id': self.fishnet_c_id,
                          'temp_day_id': self.temp_day_id}
+
+        return tweet_as_dict
+
+
+class BristolFishNet_88_40(Base):
+    __tablename__ = 'bristol_fishnet_88_40_temp'
+    id = Column(Integer, primary_key=True)  # Auto-generated ID
+    tweet_id = Column(String)  # (data.id)
+    text = Column(String)  # (data.text)
+    created_at = Column(DateTime)  # (data.created_at)
+    final_geom_point_4326 = Column(Geometry('POLYGON'))
+    final_geom_point_astext = Column(Text)
+    final_geom_point_bng = Column(Geometry('POLYGON'))
+    final_point_lon = Column(DOUBLE_PRECISION)
+    final_point_lat = Column(DOUBLE_PRECISION)
+    fishnet_c_id = Column(Integer, nullable=True)
+    temp_day_id = Column(Integer, nullable=True)
+
+    # GEOMETRIC COLUMNS (bng)
+
+    # Constructor
+    def __repr__(self):
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, fishnet_c_id={}, temp_day_id={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.fishnet_c_id, self.temp_day_id)
+
+    def as_dict(self):
+
+        tweet_as_dict = {'tweet_id': self.tweet_id,
+                         'text': self.text,
+                         'created_at': self.created_at,
+                         'final_geom_point_4326': self.final_geom_point_4326,
+                         'final_geom_point_astext': self.final_geom_point_astext,
+                         'final_geom_point_bng': self.final_geom_point_bng,
+                         'final_point_lon': self.final_point_lon,
+                         'final_point_lat': self.final_point_lat,
+                         'fishnet_c_id': self.fishnet_c_id,
+                         'temp_day_id': self.temp_day_id}
+
+        return tweet_as_dict
+
+
+class Bristol_Set2_DBSCAN(Base):
+    __tablename__ = 'bristol_set2_dbscan'
+    id = Column(Integer, primary_key=True)  # Auto-generated ID
+    tweet_id = Column(String)  # (data.id)
+    text = Column(String)  # (data.text)
+    created_at = Column(DateTime)  # (data.created_at)
+    final_geom_point_4326 = Column(Geometry('POLYGON'))
+    final_geom_point_astext = Column(Text)
+    final_geom_point_bng = Column(Geometry('POLYGON'))
+    final_point_lon = Column(DOUBLE_PRECISION)
+    final_point_lat = Column(DOUBLE_PRECISION)
+    # DBSCAN IDs (entire time window)
+    dbscan_005_5 = Column(Integer)
+    dbscan_002_5 = Column(Integer)
+    dbscan_001_5 = Column(Integer)
+    dbscan_0005_5 = Column(Integer)
+    temp_day_id = Column(Integer, nullable=True)
+    # DBSCAN IDs (per day)
+    dbscan_002_5_temp = Column(Integer)
+    dbscan_004_5_temp = Column(Integer)
+
+    # GEOMETRIC COLUMNS (bng)
+
+    # Constructor
+
+    def __repr__(self):
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, dbscan_005_5={}, dbscan_002_5={}, dbscan_001_5={}, dbscan_0005_5={}, temp_day_id={}, dbscan_002_5_temp={}, dbscan_004_5_temp={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.dbscan_005_5, self.dbscan_002_5, self.dbscan_001_5, self.dbscan_0005_5, self.temp_day_id, self.dbscan_002_5_temp, self.dbscan_004_5_temp)
+
+    def as_dict(self):
+
+        tweet_as_dict = {'tweet_id': self.tweet_id,
+                         'text': self.text,
+                         'created_at': self.created_at,
+                         'final_geom_point_4326': self.final_geom_point_4326,
+                         'final_geom_point_astext': self.final_geom_point_astext,
+                         'final_geom_point_bng': self.final_geom_point_bng,
+                         'final_point_lon': self.final_point_lon,
+                         'final_point_lat': self.final_point_lat,
+                         'dbscan_005_5': self.dbscan_005_5,
+                         'dbscan_002_5': self.dbscan_002_5,
+                         'dbscan_001_5': self.dbscan_001_5,
+                         'dbscan_0005_5': self.dbscan_0005_5,
+                         'temp_day_id': self.temp_day_id,
+                         'dbscan_002_5_temp': self.dbscan_002_5_temp,
+                         'dbscan_004_5_temp': self.dbscan_004_5_temp}
 
         return tweet_as_dict

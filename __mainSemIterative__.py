@@ -9,6 +9,7 @@ import time
 from DataLoader import *
 from models.ModelBristol import *
 from models.ModelFishNet import *
+from models.ModelDBSCAN import *
 from NLPPreProcessor import *
 from sklearn import preprocessing
 from sklearn.metrics.pairwise import pairwise_distances
@@ -16,24 +17,20 @@ from sklearn import metrics
 import fastcluster
 import scipy.cluster.hierarchy as sch
 from collections import Counter
-import CMUTweetTagger
 from scipy.cluster import hierarchy
 from TFIDF import *
-from FishNetLoader import *
+from dataloaders.FishNetLoader import *
+from dataloaders.DBSCANloader import *
 
 
 def main():
-    """
-    # fishnet ID
-    fishnet_id = 4
-    """
 
     # INSTANTIATE TweetCrawler object
     tweetCrawler = TweetCrawler(DATABASE_URI_RDS_TWEETS)
 
     # GET tweets
     query_df = tweetCrawler.crawl_data_with_session(
-        BristolFishNet_11_5)
+        Bristol_Set2_DBSCAN)
 
     # convert "created_at" to datetime
     query_df["created_at"] = pd.to_datetime(query_df["created_at"])
@@ -53,9 +50,9 @@ def main():
     # LOAD DATA
     data_loader = DataLoader(DATABASE_URI_RDS_TWEETS)
 
-    # data_loader.update_all(sig_words_df, BristolFishnet)
+    data_loader.update_all(sig_words_df, BristolDBSCAN_004_5)
 
-    sig_words_df.to_csv("fishnet_results/sig_words/bristol_trial_2.csv")
+    # sig_words_df.to_csv("fishnet_results/sig_words/bristol_trial_2opp.csv")
 
     #print(sig_words_df.loc[:, "sig_words_array"])
     #print(sig_words_df.loc[:, "sig_weights_array"])
@@ -64,7 +61,7 @@ def main():
 
 def load_fishnet_table():
 
-    df = pd.read_csv('fishnet_table.csv')
+    df = pd.read_csv('fishnet_table_80_443.csv')
 
     print(df.head(10))
 
@@ -73,8 +70,21 @@ def load_fishnet_table():
     fishnet_loader.transform_and_load(df)
 
 
+def load_dbscan_table():
+
+    df = pd.read_csv('DBSCAN_table2.csv')
+
+    print(df.head(10))
+
+    dbscan_loader = DBSCANLoader(DATABASE_URI_RDS_TWEETS)
+
+    dbscan_loader.transform_and_load(df)
+
+
 if __name__ == "__main__":
 
     main()
 
     # load_fishnet_table()
+
+    # load_dbscan_table()
