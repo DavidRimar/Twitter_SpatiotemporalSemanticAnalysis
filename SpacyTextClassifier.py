@@ -46,6 +46,9 @@ class SpacyTextClassifier():
         self.dev_texts = None
         self.dev_cats = None
 
+        # save tweet IDs used for training
+        self.train_tweet_id_list = []
+
     # ########## METHODS
 
     def load_data(self, train_tuples, split=0.8):
@@ -79,13 +82,15 @@ class SpacyTextClassifier():
         raw_dataset_df.label[raw_dataset_df.tweet_score >= 4] = 1
 
         # get a sample of 2000 tweets each for pos and neg
-        train_pos_df = raw_dataset_df[raw_dataset_df.label == 1][:1000]
-        train_neg_df = raw_dataset_df[raw_dataset_df.label == 0][:1000]
+        train_pos_df = raw_dataset_df[raw_dataset_df.label == 1][:2500]
+        train_neg_df = raw_dataset_df[raw_dataset_df.label == 0][:2500]
         training_data = train_pos_df.append(train_neg_df)
         print("shape of training data: ", training_data.shape)
 
         print(training_data.head(10))
         print(training_data.tail(10))
+
+        self.train_tweet_id_list = training_data['tweet_id'].to_list()
 
         # spacy accepts list of tuples (text, label)
         training_data['tuples'] = training_data.apply(
@@ -207,3 +212,29 @@ class SpacyTextClassifier():
 
             doc = self.nlp(text)
             print(doc.cats)
+
+    def classify_unseen_tweets(self, dataframe):
+        """
+        Classify each unseen tweets and save results into a new
+        column, returning it along with the original dataframe.
+        """
+
+        # add a column to store the results
+        dataframe['predictionJSON'] = None
+
+        #
+        for index, row in dataframe.iterrows():
+
+            # if tweet_id is not self.train_tweet_id_list
+            if row['tweet_id'] not in self.train_tweet_id_list:
+
+                # do that
+                doc = self.nlp(row['text'])
+                # print(doc.cats)
+
+                # update the prediction JSON column
+                dataframe.at[index, 'predictionJSON'] = doc.cats
+
+        print("dataframe: ", dataframe.head(15))
+
+        return dataframe

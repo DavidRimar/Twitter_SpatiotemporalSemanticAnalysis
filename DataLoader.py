@@ -98,6 +98,24 @@ class DataLoader():
 
             print(f'Updated tweet with ID{spat_temp_ID}!')
 
+    def update_textclassifier_tweetID(self, model, row):
+
+        tweet_ID = str(row['tweet_id'])
+        prediction = row['predictionJSON']
+
+        # connect to DB with session
+        with self.session_scope() as s:
+
+            """
+            for row in s.query(model).filter(model.tweet_id == tweet_ID).all():
+
+                print(f"ROW with {tweet_ID}", row)
+            """
+            s.query(model).filter(model.tweet_id == tweet_ID).update(
+                {model.textclassifierjson: prediction})
+
+            print('Updated tweet with ID{tweet_ID}!')
+
     # TRANSFORM AND LOAD
     # 2.
 
@@ -106,9 +124,8 @@ class DataLoader():
         # take each row
         for index, row in dataframe.iterrows():
 
-            # call
-            # self.update_by_tweetID(model, row)
-            self.update_by_spattempID(model, row)
+            # call relevant update function
+            self.update_textclassifier_tweetID(model, row)
 
     @ contextmanager
     def session_scope(self):
