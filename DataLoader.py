@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import json
 from sqlalchemy import update
-
+import math
 
 """
 The TweetLoader class takes care of transforming the fields from a response
@@ -116,6 +116,45 @@ class DataLoader():
 
             print('Updated tweet with ID{tweet_ID}!')
 
+    def update_fastcluster_tweetID(self, model, row):
+
+        tweet_ID = str(row['tweet_id'])
+        clusterID = row['cluster']
+
+        print("type: ", type(clusterID))
+
+        if math.isnan(clusterID):
+
+            print('Cluster ID {tweet_ID} is NONE!')
+
+        else:
+
+            # connect to DB with session
+            with self.session_scope() as s:
+
+                """
+                for row in s.query(model).filter(model.tweet_id == tweet_ID).all():
+
+                    print(f"ROW with {tweet_ID}", row)
+                """
+                s.query(model).filter(model.tweet_id == tweet_ID).update(
+                    {model.fastcluster_id_07: clusterID})
+
+                print('Updated tweet with ID{tweet_ID}!')
+
+    def update_by_stdbscanID(self, model, row):
+
+        stdbscan_ID = row['stdbscan_id']
+        sig_words_dict = row['sig_words_dict']
+
+        # connect to DB with session
+        with self.session_scope() as s:
+
+            s.query(model).filter(model.stdbscan_id == stdbscan_ID).update(
+                {model.tfidf_unigrams: sig_words_dict})
+
+            print(f'Updated stdbscan cluster with ID{stdbscan_ID}!')
+
     # TRANSFORM AND LOAD
     # 2.
 
@@ -125,7 +164,7 @@ class DataLoader():
         for index, row in dataframe.iterrows():
 
             # call relevant update function
-            self.update_textclassifier_tweetID(model, row)
+            self.update_by_stdbscanID(model, row)
 
     @ contextmanager
     def session_scope(self):
