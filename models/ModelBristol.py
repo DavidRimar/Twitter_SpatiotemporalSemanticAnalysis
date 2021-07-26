@@ -98,22 +98,14 @@ class BristolSet2ST(Base):
 
     # STDBSCAN VARIATIONS (meter_minutes_minpts)
     # 3 DAY (4320 minutes)
-    stdbscan_5000_4320_5 = Column(Integer, nullable=True)
-    #stdbscan_3500_4320_5 = Column(Integer, nullable=True)
-    #stdbscan_2500_4320_5 = Column(Integer, nullable=True)
-    #stdbscan_6000_4320_5 = Column(Integer, nullable=True)
+    stdbscan_01_3600_5 = Column(Integer, nullable=True)
 
-    # 6 DAY (8640 minutes)
-    #stdbscan_5000_8640_2 = Column(Integer, nullable=True)
-    #stdbscan_3500_8640_2 = Column(Integer, nullable=True)
-    #stdbscan_2500_8640_2 = Column(Integer, nullable=True)
-    #stdbscan_1000_8640_2 = Column(Integer, nullable=True)
-
-    # GEOMETRIC COLUMNS (bng)
+    fastcluster_id_07 = Column(Integer)
 
     # Constructor
+
     def __repr__(self):
-        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, stdbscan_5000_4320_5={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.stdbscan_5000_4320_5)
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, stdbscan_01_3600_5={}, fastcluster_id_07={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.stdbscan_01_3600_5, self.fastcluster_id_07)
 
     def as_dict(self):
 
@@ -125,7 +117,8 @@ class BristolSet2ST(Base):
                          'final_geom_point_bng': self.final_geom_point_bng,
                          'final_point_lon': self.final_point_lon,
                          'final_point_lat': self.final_point_lat,
-                         'stdbscan_5000_4320_5': self.stdbscan_5000_4320_5}
+                         'stdbscan_01_3600_5': self.stdbscan_01_3600_5,
+                         'fastcluster_id_07': self.fastcluster_id_07}
 
         return tweet_as_dict
 
@@ -343,5 +336,47 @@ class Bristol_Set2_TextClassifier(Base):
                          'final_point_lat': self.final_point_lat,
                          'tweet_score': self.tweet_score,
                          'textclassifierjson': self.textclassifierjson}
+
+        return tweet_as_dict
+
+
+class Bristol_Set2_TextClassifier_70(Base):
+    __tablename__ = 'bristol_set2_textclassifier_70'
+    id = Column(Integer, primary_key=True)  # Auto-generated ID
+    tweet_id = Column(String)  # (data.id)
+    text = Column(String)  # (data.text)
+    created_at = Column(DateTime)  # (data.created_at)
+    final_geom_point_4326 = Column(Geometry('POLYGON'))
+    final_geom_point_astext = Column(Text)
+    final_geom_point_bng = Column(Geometry('POLYGON'))
+    final_point_lon = Column(DOUBLE_PRECISION)
+    final_point_lat = Column(DOUBLE_PRECISION)
+    # results of textClassifier
+    tweet_score = Column(Integer)
+    textclassifierjson = Column(JSON)
+    stdbscan_02_10800_3 = Column(Integer)
+    stdbscan_03_10800_3 = Column(Integer)
+    stdbscan_01_10800_3 = Column(Integer)
+
+    # Constructor
+
+    def __repr__(self):
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, tweet_score={}, textclassifierjson={}, stdbscan_02_10800_3={}, stdbscan_03_10800_3={}, stdbscan_01_10800_3={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.tweet_score, self.textclassifierjson, self.stdbscan_02_10800_3, self.stdbscan_03_10800_3, self.stdbscan_01_10800_3)
+
+    def as_dict(self):
+
+        tweet_as_dict = {'tweet_id': self.tweet_id,
+                         'text': self.text,
+                         'created_at': self.created_at,
+                         'final_geom_point_4326': self.final_geom_point_4326,
+                         'final_geom_point_astext': self.final_geom_point_astext,
+                         'final_geom_point_bng': self.final_geom_point_bng,
+                         'final_point_lon': self.final_point_lon,
+                         'final_point_lat': self.final_point_lat,
+                         'tweet_score': self.tweet_score,
+                         'textclassifierjson': self.textclassifierjson,
+                         'stdbscan_02_10800_3': self.stdbscan_02_10800_3,
+                         'stdbscan_03_10800_3': self.stdbscan_03_10800_3,
+                         'stdbscan_01_10800_3': self.stdbscan_01_10800_3}
 
         return tweet_as_dict

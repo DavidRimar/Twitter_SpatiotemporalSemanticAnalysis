@@ -9,7 +9,6 @@ from datetime_truncate import truncate
 import time
 from DataLoader import *
 from models.ModelBristol import *
-from NLPPreProcessor import *
 from sklearn import preprocessing
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn import metrics
@@ -26,6 +25,120 @@ class TFIDF():
         self.dataframe = dataframe
 
         self.nlp_pre_processor = NLPPreProcessor(self.dataframe)
+
+    def get_tfidf_stdbscan(self):
+
+        number_of_stdbscan_clusters = 540
+
+        # arrays holding results for all time windows and space
+        final_stdbscan_id_list = []
+        final_sig_words_dict = []
+
+        # ######## calculate IDF score (using all stdbscan clusters) #######
+        raw_tweet_corpus_all = self.nlp_pre_processor.get_raw_tweet_text_array(
+            self.dataframe)
+
+        # CLEANSE ALL TWEETS
+        cleansed_tweet_corpus_all = self.nlp_pre_processor.cleanse_all_tweets(
+            raw_tweet_corpus_all)
+
+        cleansed_tweet_corpus_all_joined = [
+            ' '.join(arr) for arr in cleansed_tweet_corpus_all]
+
+        print("Cleansing DONE!")
+
+        # VECTORIZE
+        vectorizer = TfidfVectorizer(ngram_range=(1, 1))
+        vectorizer.fit_transform(cleansed_tweet_corpus_all_joined)
+
+        # FOR LOOP: iterate through each spatiotemporal cluster
+        for stdbscan_id in range(1, number_of_stdbscan_clusters):
+
+            # get the tweets corresponding to the spatiotemporal cluster
+            spatiotemp_df = self.dataframe.loc[self.dataframe['stdbscan_02_10800_3'] == stdbscan_id]
+
+            print("length of temp_df\n", len(spatiotemp_df))
+
+            # CLEANSE ALL TWEETS
+            raw_tweet_corpus_stdbscan = self.nlp_pre_processor.get_raw_tweet_text_array(
+                spatiotemp_df)
+
+            cleansed_tweet_corpus_stdbscan = self.nlp_pre_processor.cleanse_all_tweets(
+                raw_tweet_corpus_stdbscan)
+
+            # cleansed_spat_temp_tweet_corpus_joined = [
+            #    ' '.join(arr) for arr in cleansed_spat_temp_tweet_corpus]
+
+            # BUILD DOCUMENT
+            stdbscan_doc = self.build_document_from_corpus(
+                cleansed_tweet_corpus_stdbscan)
+
+            # GET SIGNIFICANT WORDS
+            # TF PART: the spat temp document is evaluated in the light
+            # of the IDF learned on this temporal window i.e. the IDF part
+            stdbscan_response = vectorizer.transform([stdbscan_doc])
+
+            # sorted tfidf
+            tfidf_sorted = np.argsort(
+                stdbscan_response.toarray()).flatten()[::-1]
+
+            feature_names = vectorizer.get_feature_names()
+
+            feature_array = np.array(vectorizer.get_feature_names())
+
+            tfidf_top_10 = feature_array[tfidf_sorted][:10]
+            tfidf_20 = feature_array[tfidf_sorted][10:20]
+
+            # initialize dictionary to hold tfidf results for this d=stdbscan cluster
+            sig_weights_current = []
+            sig_words_dict_current = {}
+
+            for col in stdbscan_response.nonzero()[1]:
+                if feature_names[col] in tfidf_top_10:
+
+                    """
+                    word = ""
+
+                    if feature_names[col] == "and":
+
+                        word = tfidf_11
+
+                    else:
+
+                        word = feature_names[col]
+                    """
+                    word = feature_names[col]
+
+                    weight = stdbscan_response[0, col]
+
+                    print(word, ' - ', weight)
+
+                    # add to weights list
+                    sig_weights_current.append(weight)
+
+                    # add to dictionary
+                    sig_words_dict_current[word] = weight
+
+            # append this tfidf dict to final list of dicts
+            final_sig_words_dict.append(sig_words_dict_current)
+
+            # print("current weights: ", sig_weights_current)
+            print("Added sig_words_dict_current:\n ", sig_words_dict_current)
+
+            # APPEND RESULTS TO LISTS (this time window's results)
+            final_stdbscan_id_list.append(stdbscan_id)
+            final_sig_words_dict.append(sig_words_dict_current)
+
+        # BUILD FINAL DF
+        df_tfidf = pd.DataFrame(list(zip(final_stdbscan_id_list, final_sig_words_dict)), columns=[
+            "stdbscan_id", "sig_words_dict"])
+
+        print(df_tfidf.head(15))
+
+        # when all time windows are over,
+        # we want the df_spat_tfidfs to be concatenated
+        # and returned
+        return df_tfidf
 
     def get_tfidf_spat_temp(self):
 
@@ -210,6 +323,8 @@ class TFIDF():
 
         return document_string
 
+
+"""
     def get_clusters_for_all(self):
 
         # LOOP THROUGH EACH DAY (i.e. temp_day_ID)
@@ -330,3 +445,4 @@ class TFIDF():
         #    L)
 
         # plt.show()
+"""
