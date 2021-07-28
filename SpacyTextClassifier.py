@@ -13,7 +13,7 @@ The TweetCrawler class is responsible for query the DB.
 class SpacyTextClassifier():
 
     ### CONSTRUCTOR ###
-    def __init__(self):
+    def __init__(self, architecture):
 
         ### INSTANCE VARIABLES ###
         # self.config = {
@@ -21,7 +21,7 @@ class SpacyTextClassifier():
         #    "model": DEFAULT_SINGLE_TEXTCAT_MODEL,
         # }
         # config validation error...
-        self.config = {"exclusive_classes": True, "architecture": "simple_cnn"}
+        self.config = {"exclusive_classes": True, "architecture": architecture}
 
         # init spacy NLP instance
         self.nlp = spacy.load("en_core_web_sm")
@@ -87,8 +87,8 @@ class SpacyTextClassifier():
         training_data = train_pos_df.append(train_neg_df)
         print("shape of training data: ", training_data.shape)
 
-        print(training_data.head(10))
-        print(training_data.tail(10))
+        # print(training_data.head(10))
+        # print(training_data.tail(10))
 
         self.train_tweet_id_list = training_data['tweet_id'].to_list()
 
@@ -171,17 +171,17 @@ class SpacyTextClassifier():
                 batches = minibatch(
                     train_data, size=compounding(4., 32., 1.001))
 
-                i = 0
+                j = 0
                 for batch in batches:
 
-                    print("batch: ", i)
+                    #print("batch: ", j)
 
                     texts, annotations = zip(*batch)
                     # nlp instance gets updated
                     self.nlp.update(texts, annotations, sgd=optimizer, drop=0.2,
                                     losses=losses)
 
-                    i += 1
+                    j += 1
 
                 """ VERSION 3.0.0 and above
                 for batch in minibatch(train_data, size=compounding(4., 32., 1.001)):
@@ -195,14 +195,14 @@ class SpacyTextClassifier():
                         self.nlp.update([example], sgd=optimizer)
                 """
 
-            # EVALUATE
-            with self.textcat.model.use_params(optimizer.averages):
-                # evaluate on the dev data split off in load_data()
-                scores = self.evaluate(self.nlp.tokenizer, self.textcat,
-                                       self.dev_texts, self.dev_cats)
-            print('{0:.3f}\t{1:.3f}\t{2:.3f}\t{3:.3f}'  # print a simple table
-                  .format(losses['textcat'], scores['textcat_p'],
-                          scores['textcat_r'], scores['textcat_f']))
+                # EVALUATE
+                with self.textcat.model.use_params(optimizer.averages):
+                    # evaluate on the dev data split off in load_data()
+                    scores = self.evaluate(self.nlp.tokenizer, self.textcat,
+                                           self.dev_texts, self.dev_cats)
+                print('{0:.3f}\t{1:.3f}\t{2:.3f}\t{3:.3f}'  # print a simple table
+                      .format(losses['textcat'], scores['textcat_p'],
+                              scores['textcat_r'], scores['textcat_f']))
 
     def test_model(self, text_list):
         """
@@ -235,6 +235,6 @@ class SpacyTextClassifier():
                 # update the prediction JSON column
                 dataframe.at[index, 'predictionJSON'] = doc.cats
 
-        print("dataframe: ", dataframe.head(15))
+        #print("dataframe: ", dataframe.head(15))
 
         return dataframe
