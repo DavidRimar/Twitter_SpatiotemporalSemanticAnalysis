@@ -318,11 +318,12 @@ class Bristol_Set2_TextClassifier(Base):
     # results of textClassifier
     tweet_score = Column(Integer)
     textclassifierjson = Column(JSON)
+    classified_bow = Column(JSON)
 
     # Constructor
 
     def __repr__(self):
-        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, tweet_score={}, textclassifierjson={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.tweet_score, self.textclassifierjson)
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, tweet_score={}, textclassifierjson={}, classified_bow={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.tweet_score, self.textclassifierjson, self.classified_bow)
 
     def as_dict(self):
 
@@ -335,7 +336,8 @@ class Bristol_Set2_TextClassifier(Base):
                          'final_point_lon': self.final_point_lon,
                          'final_point_lat': self.final_point_lat,
                          'tweet_score': self.tweet_score,
-                         'textclassifierjson': self.textclassifierjson}
+                         'textclassifierjson': self.textclassifierjson,
+                         'classified_bow': self.classified_bow}
 
         return tweet_as_dict
 
@@ -357,11 +359,13 @@ class Bristol_Set2_TextClassifier_70(Base):
     stdbscan_02_10800_3 = Column(Integer)
     stdbscan_03_10800_3 = Column(Integer)
     stdbscan_01_10800_3 = Column(Integer)
+    temp_day_id = Column(Integer)
+    fishnet_c_id = Column(Integer)
 
     # Constructor
 
     def __repr__(self):
-        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, tweet_score={}, textclassifierjson={}, stdbscan_02_10800_3={}, stdbscan_03_10800_3={}, stdbscan_01_10800_3={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.tweet_score, self.textclassifierjson, self.stdbscan_02_10800_3, self.stdbscan_03_10800_3, self.stdbscan_01_10800_3)
+        return "<Tweet(tweet_id='{}', text='{}', created_at={}, final_geom_point_4326={}, final_geom_point_astext={}, final_geom_point_bng={}, final_point_lon={}, final_point_lat={}, tweet_score={}, textclassifierjson={}, stdbscan_02_10800_3={}, stdbscan_03_10800_3={}, stdbscan_01_10800_3={}, temp_day_id={}, fishnet_c_id={})>".format(self.tweet_id, self.text, self.created_at, self.final_geom_point_4326, self.final_geom_point_astext, self.final_geom_point_bng,  self.final_point_lon, self.final_point_lat, self.tweet_score, self.textclassifierjson, self.stdbscan_02_10800_3, self.stdbscan_03_10800_3, self.stdbscan_01_10800_3, self.temp_day_id, self.fishnet_c_id)
 
     def as_dict(self):
 
@@ -377,6 +381,8 @@ class Bristol_Set2_TextClassifier_70(Base):
                          'textclassifierjson': self.textclassifierjson,
                          'stdbscan_02_10800_3': self.stdbscan_02_10800_3,
                          'stdbscan_03_10800_3': self.stdbscan_03_10800_3,
-                         'stdbscan_01_10800_3': self.stdbscan_01_10800_3}
+                         'stdbscan_01_10800_3': self.stdbscan_01_10800_3,
+                         'temp_day_id': self.temp_day_id,
+                         'fishnet_c_id': self.fishnet_c_id}
 
         return tweet_as_dict

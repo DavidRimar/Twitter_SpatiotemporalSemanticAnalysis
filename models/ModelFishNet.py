@@ -1,5 +1,5 @@
 from sqlalchemy.types import ARRAY, Float, JSON, Text, TEXT
-from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
+from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION, NUMERIC
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.types import ARRAY, Float
@@ -61,15 +61,26 @@ class BristolFishnet_88_40(Base):
     fishnet_geom_center = Column(Geometry('POINT'))
     fishnet_geom_center_lon = Column(DOUBLE_PRECISION)
     fishnet_geom_center_lat = Column(DOUBLE_PRECISION)
-    time_day = Column(DateTime)
-    tfidf_topwords = Column(JSON)
-    tfidf_topwords_lem = Column(JSON)
-    tfidf_bigrams = Column(JSON)
+    time_day = Column(DateTime, nullable=True)
+    tfidf_topwords = Column(JSON, nullable=True)
+    tfidf_topwords_lem = Column(JSON, nullable=True)
+    tfidf_bigrams = Column(JSON, nullable=True)
+    bristol_volumes = Column(Integer, nullable=True)
+    all_volumes = Column(Integer, nullable=True)
+    normalized_volumes = Column(NUMERIC, nullable=True)
+    grid = Column(Geometry('Polygon'), nullable=True)
+    st_asgeojson = Column(JSON, nullable=True)
+    scaled_vol_1 = Column(NUMERIC, nullable=True)
+    scaled_vol_06 = Column(NUMERIC, nullable=True)
+    tfidf_bigrams_textcat = Column(JSON)
+    bristol_volumes_textcat = Column(Integer, nullable=True)
+    normalized_volumes_textcat = Column(NUMERIC, nullable=True)
+    scaled_vol_06_textcat = Column(NUMERIC, nullable=True)
 
     # Constructor
 
     def __repr__(self):
-        return "<Tweet(spat_temp_id='{}', spat_temp_id_str='{}', fishnet_id={}, temp_day_id={}, fishnet_geom_center={}, fishnet_geom_center_lon={}, fishnet_geom_center_lat={}, time_day={}, tfidf_topwords={}, tfidf_topwords_lem={}, tfidf_bigrams={})>".format(self.spat_temp_id, self.spat_temp_id_str, self.fishnet_id, self.temp_day_id, self.fishnet_geom_center, self.fishnet_geom_center_lon, self.fishnet_geom_center_lat, self.time_day, self.tfidf_topwords, self.tfidf_topwords_lem, self.tfidf_bigrams)
+        return "<Tweet(spat_temp_id='{}', spat_temp_id_str='{}', fishnet_id={}, temp_day_id={}, fishnet_geom_center={}, fishnet_geom_center_lon={}, fishnet_geom_center_lat={}, time_day={}, tfidf_topwords={}, tfidf_topwords_lem={}, tfidf_bigrams={}, bristol_volumes={}, all_volumes={}, normalized_volumes={}, grid={}, st_asgeojson={}, scaled_vol_1={}, scaled_vol_06={}, tfidf_bigrams_textcat={}, bristol_volumes_textcat={}, normalized_volumes_textcat={}, scaled_vol_06_textcat={})>".format(self.spat_temp_id, self.spat_temp_id_str, self.fishnet_id, self.temp_day_id, self.fishnet_geom_center, self.fishnet_geom_center_lon, self.fishnet_geom_center_lat, self.time_day, self.tfidf_topwords, self.tfidf_topwords_lem, self.tfidf_bigrams, self.bristol_volumes, self.all_volumes, self.normalized_volumes, self.grid, self.st_asgeojson, self.scaled_vol_1, self.scaled_vol_06, self.tfidf_bigrams_textcat, self.bristol_volumes_textcat, self.normalized_volumes_textcat, self.scaled_vol_06_textcat)
 
     def as_dict(self):
 
@@ -83,6 +94,17 @@ class BristolFishnet_88_40(Base):
                    'time_day': self.time_day,
                    'tfidf_topwords': self.tfidf_topwords,
                    'tfidf_topwords_lem': self.tfidf_topwords_lem,
-                   'tfidf_bigrams': self.tfidf_bigrams}
+                   'tfidf_bigrams': self.tfidf_bigrams,
+                   'bristol_volumes': self.bristol_volumes,
+                   'all_volumes': self.all_volumes,
+                   'normalized_volumes': self.normalized_volumes,
+                   'grid': self.grid,
+                   'st_asgeojson': self.st_asgeojson,
+                   'scaled_vol_1': self.scaled_vol_1,
+                   'scaled_vol_06': self.scaled_vol_06,
+                   'tfidf_bigrams_textcat': self.tfidf_bigrams_textcat,
+                   'bristol_volumes_textcat': self.bristol_volumes_textcat,
+                   'normalized_volumes_textcat': self.normalized_volumes_textcat,
+                   'scaled_vol_06_textcat': self.scaled_vol_06_textcat}
 
         return as_dict

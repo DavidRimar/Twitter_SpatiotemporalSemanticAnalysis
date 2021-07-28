@@ -76,7 +76,7 @@ class DataLoader():
                 print(f"ROW with {tweet_ID}", row)
             """
             s.query(model).filter(model.spat_temp_id_str == spat_temp_ID).update(
-                {model.tfidf_topwords_lem: sig_words_dict})
+                {model.tfidf_bigrams_textcat: sig_words_dict})
 
             print(f'Updated tweet with ID{spat_temp_ID}!')
 
@@ -112,7 +112,7 @@ class DataLoader():
                 print(f"ROW with {tweet_ID}", row)
             """
             s.query(model).filter(model.tweet_id == tweet_ID).update(
-                {model.textclassifierjson: prediction})
+                {model.classified_bow: prediction})
 
             print('Updated tweet with ID{tweet_ID}!')
 
@@ -164,7 +164,7 @@ class DataLoader():
         for index, row in dataframe.iterrows():
 
             # call relevant update function
-            self.update_by_stdbscanID(model, row)
+            self.update_by_fishnetID(model, row)
 
     @ contextmanager
     def session_scope(self):

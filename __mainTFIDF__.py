@@ -15,7 +15,7 @@ from NLPPreProcessor import *
 from sklearn import preprocessing
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn import metrics
-import fastcluster
+# import fastcluster
 import scipy.cluster.hierarchy as sch
 from collections import Counter
 from scipy.cluster import hierarchy
@@ -36,10 +36,6 @@ def main_stdbscan():
     # convert "created_at" to datetime
     query_df["created_at"] = pd.to_datetime(query_df["created_at"])
 
-    # sort by created_at
-    # bristol_df = bristol_df.sort_values(by="created_at")
-    # query_df = query_df.sort_values(by="created_at")
-
     # INSTANTIATE TFIDF
     tfidf = TFIDF(query_df)
 
@@ -51,21 +47,15 @@ def main_stdbscan():
 
     data_loader.update_all(sig_words_df, STDBSCAN_02_10800_3_SEM)
 
-    # sig_words_df.to_csv("fishnet_results/sig_words/bristol_trial_2opp.csv")
 
-    #print(sig_words_df.loc[:, "sig_words_array"])
-    #print(sig_words_df.loc[:, "sig_weights_array"])
-    #print(sig_words_df.loc[:, "sig_words_dict"])
-
-
-def main():
+def main_fishnet():
 
     # INSTANTIATE TweetCrawler object
     tweetCrawler = TweetCrawler(DATABASE_URI_RDS_TWEETS)
 
     # GET tweets
     query_df = tweetCrawler.crawl_data_with_session(
-        Bristol_Set2_DBSCAN)
+        Bristol_Set2_TextClassifier_70)
 
     # convert "created_at" to datetime
     query_df["created_at"] = pd.to_datetime(query_df["created_at"])
@@ -86,44 +76,11 @@ def main():
     data_loader = DataLoader(DATABASE_URI_RDS_TWEETS)
 
     # Bristol_TextClassifier_STDBSCAN
-    data_loader.update_all(sig_words_df, BristolDBSCAN_004_5)
+    data_loader.update_all(sig_words_df, BristolFishnet_88_40)
 
-    # sig_words_df.to_csv("fishnet_results/sig_words/bristol_trial_2opp.csv")
-
-    #print(sig_words_df.loc[:, "sig_words_array"])
-    #print(sig_words_df.loc[:, "sig_weights_array"])
-    #print(sig_words_df.loc[:, "sig_words_dict"])
-
-
-"""
-def load_fishnet_table():
-
-    df = pd.read_csv('fishnet_table_80_443.csv')
-
-    print(df.head(10))
-
-    fishnet_loader = FishNetLoader(DATABASE_URI_RDS_TWEETS)
-
-    fishnet_loader.transform_and_load(df)
-
-
-def load_dbscan_table():
-
-    df = pd.read_csv('DBSCAN_table2.csv')
-
-    print(df.head(10))
-
-    dbscan_loader = DBSCANLoader(DATABASE_URI_RDS_TWEETS)
-
-    dbscan_loader.transform_and_load(df)
-"""
 
 if __name__ == "__main__":
 
-    # main()
+    main_fishnet()
 
-    main_stdbscan()
-
-    # load_fishnet_table()
-
-    # load_dbscan_table()
+    # main_stdbscan()

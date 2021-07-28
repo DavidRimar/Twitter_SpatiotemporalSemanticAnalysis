@@ -58,8 +58,10 @@ class TweetCrawler():
                 else:  # if filtering is not none
 
                     # use session to get rows with flter
+                    # query_result = s.query(model).filter(
+                    #    model.fishnet_c_id == filtering).all()
                     query_result = s.query(model).filter(
-                        model.fishnet_c_id == filtering).all()
+                        model.text.ilike(filtering)).all()
 
                     print("Query wit Filter works!")
 
