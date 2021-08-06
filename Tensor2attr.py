@@ -1,3 +1,7 @@
+"""
+SOURCE: https://applied-language-technology.readthedocs.io/en/latest/notebooks/part_iii/04_embeddings_continued.html
+"""
+
 # Import the Language object under the 'language' module in spaCy,
 # and NumPy for calculating cosine similarity.
 from spacy.language import Language

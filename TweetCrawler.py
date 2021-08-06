@@ -63,7 +63,7 @@ class TweetCrawler():
                     query_result = s.query(model).filter(
                         model.text.ilike(filtering)).all()
 
-                    print("Query wit Filter works!")
+                    #print("Query wit Filter works!")
 
                     df_query_result = self.convert_results_to_df(query_result)
 

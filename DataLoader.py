@@ -155,6 +155,19 @@ class DataLoader():
 
             print(f'Updated stdbscan cluster with ID{stdbscan_ID}!')
 
+    def update_cont_emb(self, model, row):
+    
+        tweet_ID = row['tweet_id']
+        contextual_embedding_classification = row['classified_march']
+
+        # connect to DB with session
+        with self.session_scope() as s:
+
+            s.query(model).filter(model.tweet_id == tweet_ID).update(
+                {model.classified_march: contextual_embedding_classification})
+
+            print(f'Updated tweet ID{tweet_ID}!')
+
     # TRANSFORM AND LOAD
     # 2.
 
@@ -164,7 +177,7 @@ class DataLoader():
         for index, row in dataframe.iterrows():
 
             # call relevant update function
-            self.update_by_fishnetID(model, row)
+            self.update_cont_emb(model, row)
 
     @ contextmanager
     def session_scope(self):
