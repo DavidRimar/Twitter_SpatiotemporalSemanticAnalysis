@@ -5,12 +5,6 @@ def count_tweets_classified(df, march_type):
 
     for index, row in df.iterrows():
 
-        if row['textclassifierjson']['POSITIVE'] is None:
-
-            print(numb)
-
-        
-
         if row['textclassifierjson']['POSITIVE'] > float(0.7):
 
             if row['classified_march'] == march_type:
