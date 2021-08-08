@@ -4,6 +4,7 @@ from TweetCrawler import *
 from config import *
 from models.ModelMarch import *
 from nltk.tokenize import TweetTokenizer
+from DataLoader import *
 
 ### QUERY TWEETS
 tweetCrawler = TweetCrawler(DATABASE_URI_RDS_TWEETS)
@@ -30,12 +31,12 @@ doc_march_movement_1_trf = nlp_trf('Some protesters march through the city as te
 doc_march_movement_2_trf = nlp_trf('As police invaded the crowd, people decided to march towards the square.')
 doc_march_movement_3_trf = nlp_trf('Activitist organized a coordinated march to make their voices heard against the bill')
 
-doc_march_month_1_trf = nlp_trf('The are protests on Saturday 26th March 2021 against the kill the bill movement')
+doc_march_month_1_trf = nlp_trf('The are protests on Saturday 26th March 2021 against the bill')
 doc_march_month_2_trf = nlp_trf('Cant believe it is March already, wanna wear my new hoodies xD.')
-doc_march_month_3_trf = nlp_trf('The government announced new plans for green investments, effective as of March 2022')
+doc_march_month_3_trf = nlp_trf('The government announced new plans for green investments, effective as of 29th March 2022')
 
 doc_march_movement_lg = nlp_lg('The protesters march through the city as tensions escalate unexpectedly')
-doc_march_month_lg = nlp_lg('The are protests on Saturday 26th March 2021 against the kill the bill movement')
+doc_march_month_lg = nlp_lg('The are protests on Saturday 26th March 2021 against the bill')
 
 #print(doc_march_month_lg)
 
@@ -47,7 +48,8 @@ march_movement_3_trf = doc_march_movement_3_trf[4]
 
 march_month_1_trf = doc_march_month_1_trf[6]
 march_month_2_trf = doc_march_month_2_trf[5]
-march_month_3_trf = doc_march_month_3_trf[12]
+march_month_3_trf = doc_march_month_3_trf[13]
+
 
 print("march movement 1: ", march_movement_1_trf)
 print("march movement 2: ", march_movement_2_trf)
@@ -56,6 +58,7 @@ print("march movement 3: ", march_movement_3_trf)
 print("march month 1: ", march_month_1_trf)
 print("march month 2: ", march_month_2_trf)
 print("march month 3: ", march_month_3_trf)
+
 
 march_movement_lg = doc_march_movement_lg[2]
 march_month_lg = doc_march_month_lg[6]
@@ -80,26 +83,22 @@ def classify_march(df):
 
         doc_text_trf = nlp_trf(text)
 
-        # FIND THE INDEX POSITION OF THE MARCH INDEX
-        march_index = 9999
+        # FIND THE MARCH TOKEN
+        march_vr_trf = None
 
-        for i in range(1, len(tokenized_tweet)):
+        for i in range(1, len(doc_text_trf)):
 
-            #print(type(tokenized_tweet[i]))
+            if doc_text_trf[i].text.lower() == 'march':
 
-            if tokenized_tweet[i].lower() == 'march':
+                # save the march vector representation
+                march_vr_trf = doc_text_trf[i]
 
-                print("sdgsdgsd")
-
-                march_index = i
+                break
 
         # COMPARE SIMILARITY OF text 'march' with example 'march'
 
-        # if the word 'march' appears
-        if march_index < 9999:
-
-            # get vector representation of 'march' using the march_index
-            march_vr_trf = doc_text_trf[march_index]
+        # if the march vector representation exists
+        if march_vr_trf is not None:
 
             # march_movement_count
             march_movement_count = 0
@@ -111,33 +110,47 @@ def classify_march(df):
             # this is march in the movement sense (using 3 proxies)
             # or this is march in the month sense (using 3 proxies)
             # add to respective counts
-            if march_movement_1_trf.similarity(march_vr_trf) > 0.5:
 
-                march_movement_count += 1
+            march_movement_count += march_movement_1_trf.similarity(march_vr_trf)
+            march_movement_count += march_movement_2_trf.similarity(march_vr_trf)
+            march_movement_count += march_movement_3_trf.similarity(march_vr_trf)
+
+            march_month_count += march_month_1_trf.similarity(march_vr_trf)
+            march_month_count += march_month_2_trf.similarity(march_vr_trf)
+            march_month_count += march_month_3_trf.similarity(march_vr_trf)
+
+            """
+            if march_movement_1_trf.similarity(march_vr_trf) > 0.05:
+
+                march_movement_count += march_movement_1_trf.similarity(march_vr_trf)
             
-            if march_movement_2_trf.similarity(march_vr_trf) > 0.5:
+            if march_movement_2_trf.similarity(march_vr_trf) > 0.05:
 
-                march_movement_count += 1
+                march_movement_count += march_movement_2_trf.similarity(march_vr_trf)
 
-            if march_movement_3_trf.similarity(march_vr_trf) > 0.5:
+            if march_movement_3_trf.similarity(march_vr_trf) > 0.05:
 
-                march_movement_count += 1
+                march_movement_count += march_movement_3_trf.similarity(march_vr_trf)
             
-            if march_month_1_trf.similarity(march_vr_trf) > 0.5:
+            if march_month_1_trf.similarity(march_vr_trf) > 0.05:
     
-                march_month_count += 1
+                march_month_count += march_month_1_trf.similarity(march_vr_trf)
             
-            if march_month_2_trf.similarity(march_vr_trf) > 0.5:
+            if march_month_2_trf.similarity(march_vr_trf) > 0.05:
 
-                march_month_count += 1
+                march_month_count += march_month_2_trf.similarity(march_vr_trf)
 
-            if march_month_3_trf.similarity(march_vr_trf) > 0.5:
+            if march_month_3_trf.similarity(march_vr_trf) > 0.05:
 
-                march_month_count += 1
-
+                march_month_count += march_month_3_trf.similarity(march_vr_trf)
+            """
 
             # use above counts to decide how 'march' is used
             if march_month_count < march_movement_count:
+
+                print(text)
+                print("march month: ", march_month_count)
+                print("march move: ", march_movement_count)
 
                 new_df.at[index, 'classified_march'] = 'Movement'
 
@@ -145,11 +158,20 @@ def classify_march(df):
                 
                 new_df.at[index, 'classified_march'] = 'Month'
 
-            elif  march_month_count == march_movement_count:
+            elif march_month_count == march_movement_count:
+
+                print(text)
+                print("march month: ", march_month_count)
+                print("march move: ", march_movement_count)
 
                 new_df.at[index, 'classified_march'] = 'Undecided'
 
     return new_df
 
-classed_march_df = classify_march(query_df[:10])
-print(classed_march_df.head(12))
+classed_march_df = classify_march(query_df)
+#print(classed_march_df.head(12))
+
+# DATA LOAD
+data_loader = DataLoader(DATABASE_URI_RDS_TWEETS)
+
+data_loader.update_all(classed_march_df, March_Tweets)
