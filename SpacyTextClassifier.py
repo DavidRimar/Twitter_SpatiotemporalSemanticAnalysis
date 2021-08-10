@@ -6,7 +6,9 @@ from spacy.util import minibatch, compounding
 import random
 
 """
-The TweetCrawler class is responsible for query the DB.
+The SpacyTextClassifier organizes the classification pipeline into standalone functions based on the below source:
+
+Source: https://www.machinelearningplus.com/nlp/custom-text-classification-spacy/
 """
 
 
